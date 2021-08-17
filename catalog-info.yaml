@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: kubernetes-thing
+  description: Kubernetes Thing
+  tags:
+    - foo
+    - bar
+  annotations:
+    'backstage.io/kubernetes-label-selector': 'app=backstage'
+spec:
+  type: service
+  lifecycle: experimental
+  owner: team-a
+  system: artist-engagement-portal
+  dependsOn: ['resource:artists-db']
