@@ -5,10 +5,10 @@ metadata:
   title: Spring Cloud Function App for Knative
   description: A simple Spring Cloud Function-based serverless app with JVM/Native image compilation for deploying on Knative/Cloud Native Runtime
 spec:
-  owner: 'who should own the templates from app accelerator?'
+  owner: a-machine-created-this
   type: service
   parameters:
-    - title: I think accelerators don't have a multi-stage form/stepper
+    - title: App Accelerator values
       required:
         - artifactId
         - activeProfiles
@@ -26,6 +26,7 @@ spec:
             - jvm
             - native-image
           ui:widget: checkboxes
+          uniqueItems: true
           items:
             type: string
             enum:
