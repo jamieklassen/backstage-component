@@ -1,0 +1,105 @@
+apiVersion: backstage.io/v1beta2
+kind: Template
+metadata:
+  name: knative-function
+  title: Spring Cloud Function App for Knative
+  description: A simple Spring Cloud Function-based serverless app with JVM/Native image compilation for deploying on Knative/Cloud Native Runtime
+spec:
+  owner: 'who should own the templates from app accelerator?'
+  type: service
+  parameters:
+    - title: I think accelerators don't have a multi-stage form/stepper
+      required:
+        - artifactId
+        - activeProfiles
+      properties:
+        artifactId:
+          title: Artifact ID
+          description: Knative function sample name
+          type: string
+          default: hello-function
+        activeProfiles:
+          title: Build Profile Choices
+          description: Choose JVM and Native Build profiles
+          type: array
+          default:
+            - jvm
+            - native-image
+          ui:widget: checkboxes
+          items:
+            type: string
+            enum:
+              - jvm
+              - jvm-image
+              - native
+              - native-image
+            enumNames:
+              - JVM stand-alone app
+              - JVM App in lightweight Docker container
+              - Spring Native stand-alone app
+              - Spring Native App in lightweight Docker container
+        deploymentType:
+          title: Deployment Choices
+          description: Select the deployment model for your service
+          type: string
+          default: none
+          enum:
+            - none
+            - kubernetes-resource-simple
+            - knative-resource-simple
+          enumNames:
+            - Skip deployment configurations
+            - Kubernetes Deployment and Service
+            - Knative Service Deployment
+        includeSkaffold:
+          title: Generate Skaffold file
+          description: Include a Skaffold image YAML for K8s deployment
+          type: boolean
+          default: true
+        includeKpackImage:
+          title: Generate kpack file
+          description: Include a kpack image YAML file
+          type: boolean
+          default: true
+        prefixContainerRegistryName:
+          title: Registry Prefix
+          description: Container Registry prefix, ex. gcr.io/project-name
+          type: string
+          default: docker.io/triathlonguy
+
+  # here's the steps that are executed in series in the scaffolder backend
+  steps:
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:invoke-acc-engine
+      input:
+        url: http://accelerator-engine.accelerator-system.svc.cluster.local/invocations
+        values:
+          artifactId: '{{ parameters.artifactId }}'
+          activeProfiles: '{{ parameters.activeProfiles }}'
+          deploymentType: '{{ parameters.deploymentType }}'
+          includeSkaffold: '{{ parameters.includeSkaffold }}'
+          includeKpackImage: '{{ parameters.includeKpackImage }}'
+          prefixContainerRegistryName: '{{ parameters.prefixContainerRegistryName }}'
+
+    # this step should probably be statically configurable? like if the company
+    # wants their repos to be in gitlab, this thing should publish repos there
+    - id: publish 
+      name: Publish
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        description: 'This is {{ parameters.name }}'
+        repoUrl: '{{ parameters.repoUrl }}'
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: '{{ steps.publish.output.repoContentsUrl }}'
+        catalogInfoPath: '/catalog-info.yaml'
+
+  # some outputs which are saved along with the job for use in the frontend
+  output:
+    remoteUrl: '{{ steps.publish.output.remoteUrl }}'
+    entityRef: '{{ steps.register.output.entityRef }}'
