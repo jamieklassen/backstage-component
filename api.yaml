@@ -8,5 +8,5 @@ spec:
   lifecycle: production
   owner: tap-gui
   system: tap
-  definition: |
+  definition:
     $text: https://petstore.swagger.io/v2/swagger.json
