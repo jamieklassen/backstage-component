@@ -10,6 +10,11 @@ spec:
   system: tap
   definition: |
     openapi: "3.0.0"
+    info:
+      version: 1.1.0-build.1
+      title: TAP GUI
+      license:
+        name: VMware Proprietary
     title: Tanzu Application Platform GUI Configuration Schema
     description: |
       This is the schema describing the structure of the Tanzu Application
